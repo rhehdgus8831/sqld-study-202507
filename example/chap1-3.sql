@@ -7,7 +7,7 @@ WHERE USERNAME = 'ryan'
 -- 유저의 아이디가 1번인 사용자가 올린 비디오 게시물
 SELECT *
 FROM POSTS
-WHERE USER_ID = 1 AND POST_TYPE = 'video'
+--WHERE USER_ID = 1 AND POST_TYPE = 'video'
 ;
 
 -- 유저아이디가 1번인 유저의 모든 피드게시물 또는 모든 유저의 비디오 게시물

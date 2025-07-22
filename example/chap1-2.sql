@@ -4,7 +4,7 @@ FROM USERS
 ;
 
 -- USERS테이블에서 사용자 이름과 이멜만 보고싶음
-SELECT USERNAME, EMAIL --순서 상관 ㅌ 
+SELECT USERNAME, EMAIL --순서 상관 x
 FROM USERS
 ;
 
