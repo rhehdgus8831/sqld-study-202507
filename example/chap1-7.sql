@@ -50,6 +50,13 @@ SELECT *
 FROM DEPARTMENTS
 ;
 
+-- 카티션 곱
+SELECT *
+FROM EMPLOYEES
+         CROSS JOIN DEPARTMENTS
+;
+
+
 -- JOIN은 기본 테이블을 가로로 합치는 문법이다
 -- X * Y 형태로 결과가 나옵니다.
 SELECT EMPLOYEES.ID,
@@ -155,81 +162,146 @@ FROM POSTS;
 
 -- 오라클 조인, 표준조인 (DB에 따른 분류)
 -- 내부조인, 외부조인 (DB랑 관계없이 분류)
-SELECT
-    P.POST_ID,
-    P.CONTENT,
-    P.VIEW_COUNT,
-    TO_CHAR(P.CREATION_DATE, 'YYYY-MM-DD') AS CREATED_AT,
-    C.COMMENT_TEXT
-FROM POSTS P, COMMENTS C
+SELECT P.POST_ID,
+       P.CONTENT,
+       P.VIEW_COUNT,
+       TO_CHAR(P.CREATION_DATE, 'YYYY-MM-DD') AS CREATED_AT,
+       C.COMMENT_TEXT
+FROM POSTS P,
+     COMMENTS C
 WHERE P.POST_ID = C.POST_ID
 ;
 
-SELECT
-    P.POST_ID,
-    P.CONTENT,
-    P.VIEW_COUNT,
-    TO_CHAR(P.CREATION_DATE, 'YYYY-MM-DD') AS CREATED_AT,
-    C.COMMENT_TEXT
-FROM POSTS P INNER JOIN COMMENTS C
-ON P.POST_ID = C.POST_ID
+SELECT P.POST_ID,
+       P.CONTENT,
+       P.VIEW_COUNT,
+       TO_CHAR(P.CREATION_DATE, 'YYYY-MM-DD') AS CREATED_AT,
+       C.COMMENT_TEXT
+FROM POSTS P
+         INNER JOIN COMMENTS C
+                    ON P.POST_ID = C.POST_ID
 ;
 
 --------------------------------------------------------------------------------------------------------
 
-SELECT
-    P.USER_ID,
-    U.USERNAME,
-    P.POST_ID,
-    P.CONTENT,
-    P.VIEW_COUNT,
-    TO_CHAR(P.CREATION_DATE, 'YYYY-MM-DD') AS CREATED_AT,
-    C.USER_ID,
-    U2.USERNAME AS COMMENTER,
-    C.COMMENT_TEXT
+SELECT P.USER_ID,
+       U.USERNAME,
+       P.POST_ID,
+       P.CONTENT,
+       P.VIEW_COUNT,
+       TO_CHAR(P.CREATION_DATE, 'YYYY-MM-DD') AS CREATED_AT,
+       C.USER_ID,
+       U2.USERNAME                            AS COMMENTER,
+       C.COMMENT_TEXT
 FROM POSTS P
-INNER JOIN COMMENTS C
-ON P.POST_ID = C.POST_ID
-INNER JOIN  USERS U
-ON P.USER_ID = U.USER_ID
-INNER JOIN  USERS U2
-ON C.USER_ID = U2.USER_ID
+         INNER JOIN COMMENTS C
+                    ON P.POST_ID = C.POST_ID
+         INNER JOIN USERS U
+                    ON P.USER_ID = U.USER_ID
+         INNER JOIN USERS U2
+                    ON C.USER_ID = U2.USER_ID
 ;
 --------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------
 -- OUTER JOIN
-SELECT * FROM USERS;         -- 필수 정보
-SELECT * FROM USER_PROFILES; -- 선택 정보
+SELECT *
+FROM USERS; -- 필수 정보
+SELECT *
+FROM USER_PROFILES;
+-- 선택 정보
 
 
 -- INNER JOIN의 문제점
 -- 값이 매칭되는 경우만 조회되므로 상세 프로필을 안적은 회원은 나타나지 않음.
-SELECT
-    U.USER_ID,
-    U.USERNAME,
-    U.EMAIL,
-    UP.FULL_NAME,
-    UP.BIO
+SELECT U.USER_ID,
+       U.USERNAME,
+       U.EMAIL,
+       UP.FULL_NAME,
+       UP.BIO
 FROM USERS U
-JOIN USER_PROFILES UP
-ON U.USER_ID = UP.USER_ID
+         JOIN USER_PROFILES UP
+              ON U.USER_ID = UP.USER_ID
 ;
 
 -- 우선 회원정보는 모두 조회하고 단, 상세프로필이 있으면 걔네만 같이 조회해라 OUTER JOIN
-SELECT
-    *
+SELECT *
 FROM USERS U
-LEFT OUTER JOIN USER_PROFILES UP
-ON U.USER_ID = UP.USER_ID
+         LEFT OUTER JOIN USER_PROFILES UP
+                         ON U.USER_ID = UP.USER_ID
 ORDER BY U.USER_ID
 ;
-
 
 
 -- 오라클 외부 조인 : LEFT -> 오른쪽 조건에 (+), RIGHT -> 왼쪽 조건에 (+)
-SELECT
-    *
-FROM USERS U, USER_PROFILES UP
+SELECT *
+FROM USERS U,
+     USER_PROFILES UP
 WHERE U.USER_ID = UP.USER_ID (+)
 ORDER BY U.USER_ID
 ;
+
+---------------------------------------------------------------------------------------------------
+----------------------------------------7/28-------------------------------------------------------
+
+SELECT *
+FROM EMPLOYEES
+;
+
+SELECT *
+FROM DEPARTMENTS
+;
+
+-- 카티션 곱
+SELECT *
+FROM EMPLOYEES
+         CROSS JOIN DEPARTMENTS
+;
+
+-- NATURAL JOIN
+-- NATURAL JOIN은 공통 조인 매칭 컬럼의 별칭을 표기해선 안된다.
+SELECT USER_ID,
+       U.USERNAME,
+       U.EMAIL,
+       UP.FULL_NAME,
+       UP.BIO
+FROM USERS U
+NATURAL JOIN USER_PROFILES UP
+--ON U.USER_ID = UP.USER_ID
+;
+
+SELECT *
+FROM USERS U
+INNER JOIN USER_PROFILES UP
+ON U.USER_ID = UP.USER_ID
+;
+
+SELECT *
+FROM USERS U
+NATURAL JOIN USER_PROFILES UP
+;
+
+-- USING 절
+SELECT USER_ID, -- U.USER_ID처럼 별칭을 붙이면 안됨.
+       U.USER                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 NAME,
+       U.EMAIL,
+       UP.FULL_NAME,
+       UP.BIO
+FROM USERS U
+JOIN USER_PROFILES UP
+USING (USER_ID)
+;
+
+
+-- SELF JOIN
+SELECT
+    U1.USER_ID,
+    U1.USERNAME,
+    U1.MANAGER_ID,
+    NVL(U2.USERNAME,'상사없음') AS MANAGER_NAME
+FROM USERS U1
+LEFT JOIN USERS U2
+ON U1.MANAGER_ID = U2.USER_ID
+ORDER BY U1.USER_ID
+;
+
+
