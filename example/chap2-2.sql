@@ -262,3 +262,53 @@ FROM
     POSTS p
 ;
 
+-- 게시물을 한 번이라도 작성한 적이 있는 모든 사용자의 이름을 알려주세요
+SELECT DISTINCT P.USER_ID, U.USERNAME
+FROM POSTS P
+JOIN USERS U
+ON P.USER_ID = U.USER_ID
+ORDER BY USER_ID;
+;
+
+SELECT
+    U.USER_ID,
+    u.username
+FROM
+    USERS u
+WHERE
+    EXISTS (
+        SELECT 1
+        FROM POSTS p
+        WHERE p.user_id = u.user_id
+        )
+;
+
+SELECT
+    U.USER_ID,
+    u.username
+FROM
+    USERS u
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM POSTS p
+        WHERE p.user_id = u.user_id
+    )
+ORDER BY  U.USER_ID
+;
+
+
+
+SELECT
+U.USER_ID,U.USERNAME
+FROM USERS U
+ORDER BY  U.USER_ID
+;
+
+SELECT
+P.USER_ID, P.POST_ID
+FROM POSTS P
+ORDER BY P.USER_ID
+;
+
+
